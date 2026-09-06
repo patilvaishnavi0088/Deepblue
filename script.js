@@ -36,18 +36,39 @@ function createFish(x, y, forcedDirection) {
   }, lifespan);
 }
 
-document.body.addEventListener("click", function (e) {
-  createFish(e.pageX, e.pageY);
-});
+let lastTap = 0;
+let tapTimer;
 
-document.body.addEventListener("dblclick", function (e) {
-  const groupDirection = Math.random() < 0.5 ? -1 : 1;
-  const groupSize = Math.floor(Math.random() * 3) + 5;
+document.body.addEventListener("pointerup", function (e) {
+  const currentTime = Date.now();
+  const tapGap = currentTime - lastTap;
 
-  for (let i = 0; i < groupSize; i++) {
-    const offsetX = e.pageX + (Math.random() * 100 - 50);
-    const offsetY = e.pageY + (Math.random() * 60 - 30);
-    createFish(offsetX, offsetY, groupDirection);
+  clearTimeout(tapTimer);
+
+  if (tapGap < 300 && tapGap > 0) {
+
+    // DOUBLE TAP
+    const groupDirection = Math.random() < 0.5 ? -1 : 1;
+    const groupSize = Math.floor(Math.random() * 3) + 5;
+
+    for (let i = 0; i < groupSize; i++) {
+      const offsetX = e.pageX + (Math.random() * 100 - 50);
+      const offsetY = e.pageY + (Math.random() * 60 - 30);
+
+      createFish(offsetX, offsetY, groupDirection);
+    }
+
+    lastTap = 0;
+
+  } else {
+
+    // SINGLE TAP
+    tapTimer = setTimeout(() => {
+      createFish(e.pageX, e.pageY);
+      lastTap = 0;
+    }, 300);
+
+    lastTap = currentTime;
   }
 });
 
