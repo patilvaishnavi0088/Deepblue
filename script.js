@@ -1,14 +1,33 @@
 const fishImages = ["fish1.png", "goldenfish.png"];
 const fishList = [];
 
+
+/* =========================
+   MOBILE TOUCH SETTINGS
+   ========================= */
+
+document.documentElement.style.touchAction = "manipulation";
+document.body.style.touchAction = "manipulation";
+
+
+/* =========================
+   CREATE FISH
+   ========================= */
+
 function createFish(x, y, forcedDirection) {
+
   const fish = document.createElement("img");
+
   fish.classList.add("fish");
 
-  const randomImg = fishImages[Math.floor(Math.random() * fishImages.length)];
+  const randomImg =
+    fishImages[Math.floor(Math.random() * fishImages.length)];
+
   fish.src = randomImg;
 
-  const randomSize = Math.floor(Math.random() * 40) + 40;
+  const randomSize =
+    Math.floor(Math.random() * 40) + 40;
+
   fish.style.width = randomSize + "px";
 
   fish.style.left = x + "px";
@@ -23,8 +42,10 @@ function createFish(x, y, forcedDirection) {
       ? -1
       : 1;
 
-  const speed = Math.random() * 2 + 1.5;
+  const speed =
+    Math.random() * 2 + 1.5;
 
+  /* Fish image faces RIGHT by default */
   fish.style.transform =
     direction === 1
       ? "translate(-50%, -50%) scaleX(-1)"
@@ -32,104 +53,205 @@ function createFish(x, y, forcedDirection) {
 
   const fishData = {
     el: fish,
-    x,
-    direction,
-    speed
+    x: x,
+    direction: direction,
+    speed: speed
   };
 
   fishList.push(fishData);
 
-  const lifespan = Math.random() * 5000 + 4000;
+  const lifespan =
+    Math.random() * 5000 + 4000;
 
   setTimeout(() => {
+
     fish.remove();
 
-    const index = fishList.indexOf(fishData);
+    const index =
+      fishList.indexOf(fishData);
 
     if (index !== -1) {
       fishList.splice(index, 1);
     }
+
   }, lifespan);
 }
 
 
 /* =========================
-   FISH CLICK / DOUBLE CLICK
+   FISH INTERACTION
    ========================= */
 
-let clickTimer = null;
+let tapTimer = null;
+let lastTouchTime = 0;
 
-document.body.addEventListener("click", function (e) {
 
-  // Ignore clicks generated from buttons or other controls
-  if (e.target !== document.body && e.target.tagName !== "IMG") {
-    return;
-  }
+/* MOBILE TOUCH */
 
-  if (clickTimer !== null) {
+document.body.addEventListener(
+  "touchstart",
+  function (e) {
 
-    // DOUBLE CLICK
-    clearTimeout(clickTimer);
-    clickTimer = null;
+    e.preventDefault();
 
-    const groupDirection = Math.random() < 0.5 ? -1 : 1;
-    const groupSize = Math.floor(Math.random() * 3) + 5;
+  },
+  { passive: false }
+);
 
-    for (let i = 0; i < groupSize; i++) {
 
-      const offsetX =
-        e.clientX + (Math.random() * 100 - 50);
+document.body.addEventListener(
+  "touchend",
+  function (e) {
 
-      const offsetY =
-        e.clientY + (Math.random() * 60 - 30);
+    e.preventDefault();
 
-      createFish(offsetX, offsetY, groupDirection);
+    const touch =
+      e.changedTouches[0];
+
+    const x = touch.clientX;
+    const y = touch.clientY;
+
+    const currentTime =
+      Date.now();
+
+    const timeBetweenTaps =
+      currentTime - lastTouchTime;
+
+
+    /* DOUBLE TAP */
+
+    if (
+      timeBetweenTaps > 0 &&
+      timeBetweenTaps < 350
+    ) {
+
+      clearTimeout(tapTimer);
+
+      tapTimer = null;
+
+      const groupDirection =
+        Math.random() < 0.5
+          ? -1
+          : 1;
+
+      const groupSize =
+        Math.floor(Math.random() * 3) + 5;
+
+
+      for (let i = 0; i < groupSize; i++) {
+
+        const offsetX =
+          x + (Math.random() * 100 - 50);
+
+        const offsetY =
+          y + (Math.random() * 60 - 30);
+
+        createFish(
+          offsetX,
+          offsetY,
+          groupDirection
+        );
+      }
+
+      lastTouchTime = 0;
+
+      return;
     }
 
-  } else {
 
-    // SINGLE CLICK
-    clickTimer = setTimeout(() => {
+    /* SINGLE TAP */
 
-      createFish(e.clientX, e.clientY);
+    tapTimer = setTimeout(() => {
 
-      clickTimer = null;
+      createFish(x, y);
 
-    }, 250);
-  }
-});
+      tapTimer = null;
+
+    }, 300);
+
+
+    lastTouchTime =
+      currentTime;
+
+  },
+  { passive: false }
+);
 
 
 /* =========================
-   FISH ANIMATION
+   DESKTOP CLICK
+   ========================= */
+
+document.body.addEventListener(
+  "click",
+  function (e) {
+
+    /*
+      Mobile browsers can create
+      a click after touch.
+      Ignore those clicks.
+    */
+
+    if (
+      "ontouchstart" in window
+    ) {
+      return;
+    }
+
+    createFish(
+      e.clientX,
+      e.clientY
+    );
+
+  }
+);
+
+
+/* =========================
+   ANIMATE ALL FISH
    ========================= */
 
 function animateAllFish() {
 
-  fishList.forEach(fishData => {
+  fishList.forEach(
+    function (fishData) {
 
-    fishData.x +=
-      fishData.direction * fishData.speed;
+      fishData.x +=
+        fishData.direction *
+        fishData.speed;
 
-    if (
-      fishData.direction === 1 &&
-      fishData.x > window.innerWidth + 50
-    ) {
-      fishData.x = -50;
+
+      if (
+        fishData.direction === 1 &&
+        fishData.x >
+          window.innerWidth + 50
+      ) {
+
+        fishData.x = -50;
+
+      }
+
+
+      if (
+        fishData.direction === -1 &&
+        fishData.x < -50
+      ) {
+
+        fishData.x =
+          window.innerWidth + 50;
+
+      }
+
+
+      fishData.el.style.left =
+        fishData.x + "px";
+
     }
+  );
 
-    if (
-      fishData.direction === -1 &&
-      fishData.x < -50
-    ) {
-      fishData.x = window.innerWidth + 50;
-    }
-
-    fishData.el.style.left =
-      fishData.x + "px";
-  });
-
-  requestAnimationFrame(animateAllFish);
+  requestAnimationFrame(
+    animateAllFish
+  );
 }
 
 animateAllFish();
@@ -141,22 +263,36 @@ animateAllFish();
 
 function createOctopus() {
 
-  const octopus = document.createElement("img");
+  const octopus =
+    document.createElement("img");
 
-  octopus.classList.add("octopus");
+  octopus.classList.add(
+    "octopus"
+  );
 
-  octopus.src = "octopus.png";
+  octopus.src =
+    "octopus.png";
 
-  octopus.style.bottom = "70px";
+  octopus.style.bottom =
+    "70px";
 
-  document.body.appendChild(octopus);
+  document.body.appendChild(
+    octopus
+  );
+
 
   setTimeout(() => {
+
     octopus.remove();
+
   }, 25000);
 }
 
-setInterval(createOctopus, 15000);
+
+setInterval(
+  createOctopus,
+  15000
+);
 
 createOctopus();
 
@@ -167,42 +303,64 @@ createOctopus();
 
 function createShark() {
 
-  const shark = document.createElement("img");
+  const shark =
+    document.createElement("img");
 
-  shark.classList.add("shark");
+  shark.classList.add(
+    "shark"
+  );
 
-  shark.src = "shark.png";
+  shark.src =
+    "shark.png";
+
 
   const randomY =
     Math.random() *
-    (window.innerHeight - 300) + 100;
+      (window.innerHeight - 300) +
+    100;
 
-  shark.style.top = randomY + "px";
+  shark.style.top =
+    randomY + "px";
+
 
   const direction =
-    Math.random() < 0.5 ? -1 : 1;
+    Math.random() < 0.5
+      ? -1
+      : 1;
+
 
   let x =
     direction === 1
       ? -220
       : window.innerWidth + 220;
 
-  shark.style.left = x + "px";
+
+  shark.style.left =
+    x + "px";
+
 
   shark.style.transform =
     direction === -1
       ? "scaleX(-1)"
       : "scaleX(1)";
 
-  document.body.appendChild(shark);
+
+  document.body.appendChild(
+    shark
+  );
+
 
   const speed = 6;
 
+
   function moveShark() {
 
-    x += direction * speed;
+    x +=
+      direction * speed;
 
-    shark.style.left = x + "px";
+    shark.style.left =
+      x + "px";
+
 
     if (
       (direction === 1 &&
@@ -212,18 +370,26 @@ function createShark() {
         x > -220)
     ) {
 
-      requestAnimationFrame(moveShark);
+      requestAnimationFrame(
+        moveShark
+      );
 
     } else {
 
       shark.remove();
+
     }
   }
+
 
   moveShark();
 }
 
-setInterval(createShark, 6500);
+
+setInterval(
+  createShark,
+  6500
+);
 
 
 /* =========================
@@ -235,24 +401,40 @@ function createJellyfish() {
   const jelly =
     document.createElement("img");
 
-  jelly.classList.add("jellyfish");
+  jelly.classList.add(
+    "jellyfish"
+  );
 
-  jelly.src = "jellyfish.png";
+  jelly.src =
+    "jellyfish.png";
+
 
   const randomX =
     Math.random() *
-    (window.innerWidth - 100) + 50;
+      (window.innerWidth - 100) +
+    50;
+
 
   jelly.style.left =
     randomX + "px";
 
-  document.body.appendChild(jelly);
+
+  document.body.appendChild(
+    jelly
+  );
+
 
   setTimeout(() => {
+
     jelly.remove();
+
   }, 12000);
 }
 
-setInterval(createJellyfish, 10000);
+
+setInterval(
+  createJellyfish,
+  10000
+);
 
 createJellyfish();
