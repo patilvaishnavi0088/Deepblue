@@ -5,6 +5,7 @@ body {
   font-family: Arial, sans-serif;
   position: relative;
   overflow: hidden;
+  touch-action: manipulation;
 }
 
 .fish {
