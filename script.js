@@ -16,74 +16,117 @@ function createFish(x, y, forcedDirection) {
 
   document.body.appendChild(fish);
 
-  const direction = forcedDirection !== undefined ? forcedDirection : (Math.random() < 0.5 ? -1 : 1);
+  const direction =
+    forcedDirection !== undefined
+      ? forcedDirection
+      : Math.random() < 0.5
+      ? -1
+      : 1;
+
   const speed = Math.random() * 2 + 1.5;
 
-  // Fish images face RIGHT by default - flip when moving LEFT
-    fish.style.transform = direction === 1
-  ? `translate(-50%, -50%) scaleX(-1)`
-  : `translate(-50%, -50%)`;
+  fish.style.transform =
+    direction === 1
+      ? "translate(-50%, -50%) scaleX(-1)"
+      : "translate(-50%, -50%)";
 
-  const fishData = { el: fish, x, direction, speed };
+  const fishData = {
+    el: fish,
+    x,
+    direction,
+    speed
+  };
+
   fishList.push(fishData);
 
   const lifespan = Math.random() * 5000 + 4000;
 
   setTimeout(() => {
     fish.remove();
+
     const index = fishList.indexOf(fishData);
-    if (index !== -1) fishList.splice(index, 1);
+
+    if (index !== -1) {
+      fishList.splice(index, 1);
+    }
   }, lifespan);
 }
 
-let lastTap = 0;
-let tapTimer;
 
-document.body.addEventListener("pointerup", function (e) {
-  const currentTime = Date.now();
-  const tapGap = currentTime - lastTap;
+/* =========================
+   FISH CLICK / DOUBLE CLICK
+   ========================= */
 
-  clearTimeout(tapTimer);
+let clickTimer = null;
 
-  if (tapGap < 300 && tapGap > 0) {
+document.body.addEventListener("click", function (e) {
 
-    // DOUBLE TAP
+  // Ignore clicks generated from buttons or other controls
+  if (e.target !== document.body && e.target.tagName !== "IMG") {
+    return;
+  }
+
+  if (clickTimer !== null) {
+
+    // DOUBLE CLICK
+    clearTimeout(clickTimer);
+    clickTimer = null;
+
     const groupDirection = Math.random() < 0.5 ? -1 : 1;
     const groupSize = Math.floor(Math.random() * 3) + 5;
 
     for (let i = 0; i < groupSize; i++) {
-      const offsetX = e.pageX + (Math.random() * 100 - 50);
-      const offsetY = e.pageY + (Math.random() * 60 - 30);
+
+      const offsetX =
+        e.clientX + (Math.random() * 100 - 50);
+
+      const offsetY =
+        e.clientY + (Math.random() * 60 - 30);
 
       createFish(offsetX, offsetY, groupDirection);
     }
 
-    lastTap = 0;
-
   } else {
 
-    // SINGLE TAP
-    tapTimer = setTimeout(() => {
-      createFish(e.pageX, e.pageY);
-      lastTap = 0;
-    }, 300);
+    // SINGLE CLICK
+    clickTimer = setTimeout(() => {
 
-    lastTap = currentTime;
+      createFish(e.clientX, e.clientY);
+
+      clickTimer = null;
+
+    }, 250);
   }
 });
 
-function animateAllFish() {
-  fishList.forEach(fishData => {
-    fishData.x += fishData.direction * fishData.speed;
 
-    if (fishData.direction === 1 && fishData.x > window.innerWidth + 50) {
+/* =========================
+   FISH ANIMATION
+   ========================= */
+
+function animateAllFish() {
+
+  fishList.forEach(fishData => {
+
+    fishData.x +=
+      fishData.direction * fishData.speed;
+
+    if (
+      fishData.direction === 1 &&
+      fishData.x > window.innerWidth + 50
+    ) {
       fishData.x = -50;
     }
-    if (fishData.direction === -1 && fishData.x < -50) {
+
+    if (
+      fishData.direction === -1 &&
+      fishData.x < -50
+    ) {
       fishData.x = window.innerWidth + 50;
     }
 
-    fishData.el.style.left = fishData.x + "px";
+    fishData.el.style.left =
+      fishData.x + "px";
   });
 
   requestAnimationFrame(animateAllFish);
@@ -91,11 +134,19 @@ function animateAllFish() {
 
 animateAllFish();
 
-// OCTOPUS
+
+/* =========================
+   OCTOPUS
+   ========================= */
+
 function createOctopus() {
+
   const octopus = document.createElement("img");
+
   octopus.classList.add("octopus");
+
   octopus.src = "octopus.png";
+
   octopus.style.bottom = "70px";
 
   document.body.appendChild(octopus);
@@ -106,36 +157,65 @@ function createOctopus() {
 }
 
 setInterval(createOctopus, 15000);
+
 createOctopus();
 
-// SHARK
+
+/* =========================
+   SHARK
+   ========================= */
+
 function createShark() {
+
   const shark = document.createElement("img");
+
   shark.classList.add("shark");
+
   shark.src = "shark.png";
 
-  const randomY = Math.random() * (window.innerHeight - 300) + 100;
+  const randomY =
+    Math.random() *
+    (window.innerHeight - 300) + 100;
+
   shark.style.top = randomY + "px";
 
-  const direction = Math.random() < 0.5 ? -1 : 1;
-  let x = direction === 1 ? -220 : window.innerWidth + 220;
+  const direction =
+    Math.random() < 0.5 ? -1 : 1;
+
+  let x =
+    direction === 1
+      ? -220
+      : window.innerWidth + 220;
+
   shark.style.left = x + "px";
 
-  // Shark image faces RIGHT by default - flip when moving LEFT
-  shark.style.transform = direction === -1 ? "scaleX(-1)" : "scaleX(1)";
+  shark.style.transform =
+    direction === -1
+      ? "scaleX(-1)"
+      : "scaleX(1)";
 
   document.body.appendChild(shark);
 
   const speed = 6;
 
   function moveShark() {
+
     x += direction * speed;
+
     shark.style.left = x + "px";
 
-    if ((direction === 1 && x < window.innerWidth + 220) ||
-        (direction === -1 && x > -220)) {
+    if (
+      (direction === 1 &&
+        x < window.innerWidth + 220) ||
+
+      (direction === -1 &&
+        x > -220)
+    ) {
+
       requestAnimationFrame(moveShark);
+
     } else {
+
       shark.remove();
     }
   }
@@ -145,14 +225,26 @@ function createShark() {
 
 setInterval(createShark, 6500);
 
-// JELLYFISH
+
+/* =========================
+   JELLYFISH
+   ========================= */
+
 function createJellyfish() {
-  const jelly = document.createElement("img");
+
+  const jelly =
+    document.createElement("img");
+
   jelly.classList.add("jellyfish");
+
   jelly.src = "jellyfish.png";
 
-  const randomX = Math.random() * (window.innerWidth - 100) + 50;
-  jelly.style.left = randomX + "px";
+  const randomX =
+    Math.random() *
+    (window.innerWidth - 100) + 50;
+
+  jelly.style.left =
+    randomX + "px";
 
   document.body.appendChild(jelly);
 
@@ -162,4 +254,5 @@ function createJellyfish() {
 }
 
 setInterval(createJellyfish, 10000);
+
 createJellyfish();
