@@ -5,7 +5,7 @@ body {
   font-family: Arial, sans-serif;
   position: relative;
   overflow: hidden;
-  touch-action: none;
+  touch-action: manipulation;
   -webkit-user-select: none;
   user-select: none;
 }
