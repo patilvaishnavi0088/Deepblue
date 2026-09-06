@@ -1,4 +1,4 @@
-const fishImages = ["images/fish1.png", "images/goldenfish.png"];
+const fishImages = ["fish1.png", "goldenfish.png"];
 const fishList = [];
 
 function createFish(x, y, forcedDirection) {
@@ -74,7 +74,7 @@ animateAllFish();
 function createOctopus() {
   const octopus = document.createElement("img");
   octopus.classList.add("octopus");
-  octopus.src = "images/octopus.png";
+  octopus.src = "octopus.png";
   octopus.style.bottom = "70px";
 
   document.body.appendChild(octopus);
@@ -91,7 +91,7 @@ createOctopus();
 function createShark() {
   const shark = document.createElement("img");
   shark.classList.add("shark");
-  shark.src = "images/shark.png";
+  shark.src = "shark.png";
 
   const randomY = Math.random() * (window.innerHeight - 300) + 100;
   shark.style.top = randomY + "px";
@@ -128,7 +128,7 @@ setInterval(createShark, 6500);
 function createJellyfish() {
   const jelly = document.createElement("img");
   jelly.classList.add("jellyfish");
-  jelly.src = "images/jellyfish.png";
+  jelly.src = "jellyfish.png";
 
   const randomX = Math.random() * (window.innerWidth - 100) + 50;
   jelly.style.left = randomX + "px";
