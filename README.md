@@ -53,7 +53,7 @@ Deepblue/
 https://patilvaishnavi0088.github.io/Deepblue/
 
 
-💡 Project Highlights
+## 💡 Project Highlights
 
 This project demonstrates:
 
@@ -65,13 +65,13 @@ CSS animations
 JavaScript-based object movement
 Working with image assets
 Deploying a website using GitHub Pages
-🎯 Project Purpose
+## 🎯 Project Purpose
 
 The purpose of this project is to practice HTML, CSS, and JavaScript by creating an interactive and visually engaging underwater environment.
 
-👩‍💻 Author
+## 👩‍💻 Author
 
 Vaishnavi Patil
 
 
-This way, **everything is inside your `README.md`** and the Live Demo is right at the top. 👍
+## This way, **everything is inside your `README.md`** and the Live Demo is right at the top. 👍
